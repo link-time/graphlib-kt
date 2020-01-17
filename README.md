@@ -8,7 +8,7 @@ Gradle is used to manage the build so `./gradlew` should suffice.
 ## Currently supported graphs
 ### DirectedGraph
 A directed graph (or digraph) is a graph that is made up of a set of vertices connected by edges, where the edges have a direction associated with them. 
-  
+![Image of Digraph] (https://algs4.cs.princeton.edu/42digraph/images/dag.png)
 #### Construction
 A new instance can be constructed from a list of Edges
 
