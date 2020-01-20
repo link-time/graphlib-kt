@@ -1,17 +1,19 @@
 package com.linkedplanet.lib.graphlib.graphtypes
 
 import arrow.core.*
+import arrow.core.extensions.list.foldable.foldLeft
 import arrow.core.extensions.list.traverse.map
-import com.linkedplanet.lib.graphlib.Edge
-import com.linkedplanet.lib.graphlib.id
-import com.linkedplanet.lib.graphlib.reduceEdgeList
+import arrow.core.extensions.list.traverse.sequence
+import arrow.core.extensions.option.alternative.orElse
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.applicative.map
+import com.linkedplanet.lib.graphlib.*
 
 
 class DirectedGraph<A>(links: List<Edge<A>>) {
     val getEdgeList: () -> List<Edge<A>> = { links.toSet().toList() }
 
-    fun getVertexList(): List<A> =
-            extractNodeList().toSet().toList()
+    fun getVertexList(): List<A> = extractVertexList()
 
     fun getVerticesCount(): Int = getVertexList().size
 
@@ -75,6 +77,82 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
     }
 
     /**
+     * getContainedTrees
+     *
+     * Function returns a list of trees that are contained within the graph.
+     * To achieve this, it uses the asTree function with all current starting nodes
+     */
+    fun getContainedTrees() =
+            getInverseAdjacencyMap().filter { a -> a.value.isEmpty() }
+                    .map { vertex -> asTree(vertex.key) }
+
+    /**
+     * pathExists
+     *
+     * Returns true if there is a path between the given Vertices in the graph
+     */
+    fun pathExists(fromVertex: A, toVertex: A): Boolean =
+            getPath(fromVertex, toVertex) is Some
+
+    /**
+     * getPath
+     *
+     * Returns a path between the given Vertices on the graph or None, if there is no such path.
+     */
+    fun getPath(fromVertex: A, toVertex: A): Option<List<Edge<A>>> =
+            when {
+                fromVertex == toVertex -> Some(emptyList())
+                this.getEdgeList().contains(Edge(fromVertex, toVertex)) ->
+                    Some(listOf(Edge(fromVertex, toVertex)))
+                this.getVertexList().containsAll(listOf(fromVertex, toVertex)) ->
+                    this.getEdgeList().filter { a -> a.a == fromVertex }
+                            .map { v -> this.getPath(v.b, toVertex).map { a -> listOf(v) + a } }
+                            .foldRight(None) { a: Option<List<Edge<A>>>, b: Option<List<Edge<A>>> -> a.orElse(b) }
+                            .flatMap {
+                                when (it) {
+                                    emptyList<Edge<A>>() -> None
+                                    else -> Some(it)
+                                }
+                            }
+                else -> None
+            }
+
+    /**
+     * asTree
+     *
+     * Function generates a tree from the graph with the given startingNode as Tree-root
+     */
+    private fun asTree(startingVertex: A): Option<Tree<A>> =
+            if (this.getVertexList().contains(startingVertex)) {
+                val reducedGraph = DirectedGraph(this.removeDisconnectedGraphs(startingVertex).getEdgeList())
+                val startingVertices = DirectedGraph(reducedGraph.getEdgeList().filter { a -> a.a != startingVertex }).getInverseAdjacencyMap()
+                        .filter { a -> a.value.isEmpty() }
+                        .map { a -> a.key }
+                val endingVertices = reducedGraph.getVertexList().filterNot { it == startingVertex }
+
+                Some(Tree(startingVertex,
+                        ( if (startingVertices.isNotEmpty()) {
+                            startingVertices.map { a -> DirectedGraph(reducedGraph.getEdgeList().filter { a -> a.a != startingVertex }).asTree(a) }
+                                    .sequence(Option.applicative())
+                                    .map { it.fix() }
+                        } else {
+                            Some(endingVertices.map { Tree(it, None)})
+                        })))
+            } else {
+                None
+            }
+
+    /**
+     * removeDisconnectedGraphs
+     *
+     * Function returns a Directed Graph that is strongly connected with the given reference Vertex
+     */
+    private fun removeDisconnectedGraphs(referenceVertex: A): DirectedGraph<A> =
+            DirectedGraph(this.getEdgeList().reduceEdgeList(
+                    this.getVertexList().filter { v -> pathExists(referenceVertex, v) || pathExists(v, referenceVertex) }
+            ))
+
+    /**
      * buildAdjacencyMap
      *
      * Function takes a list of vertices and a list of edges as well as
@@ -89,11 +167,18 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
                         eList.filter { a -> Option(a).map(matcher(vertex)).fold({ false }, { it.id() }) })
             }.toMap()
 
-    private fun extractNodeList(): List<A> =
+    /**
+     * extractVertexList
+     *
+     * Function takes a list of Edges and returns the list of Vertices connected by them.
+     */
+    private fun extractVertexList(): List<A> =
             getEdgeList()
                     .map {
                         listOf(it.a, it.b)
                     }.flatten()
+                    .toSet()
+                    .toList()
 
 
     /***
@@ -106,7 +191,7 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
     private fun isCycling(): Option<Boolean> {
         return when (this.getVerticesCount()) {
             0 -> Some(false)
-            else -> this.reduceByStartingNodes().fold({ None }, { it.isCycling()})
+            else -> this.reduceByStartingNodes().fold({ None }, { it.isCycling() })
         }
     }
 
@@ -114,8 +199,8 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
      * reduceByStartingNodes
      *
      * Function reduces a directed graph by removing all Nodes, which don't have any inbound Edges
-     * Before returning it checks whether any Nodes have been removed,
-     * if not it returns None, indicating the graph is irreducible.
+     * Before returning, it checks whether any Nodes have been removed.
+     * If this is not the case it returns None, indicating the graph is irreducible.
      */
     private fun reduceByStartingNodes(): Option<DirectedGraph<A>> {
         val reducedGraph = DirectedGraph(this.getEdgeList()
@@ -130,4 +215,3 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
         }
     }
 }
-

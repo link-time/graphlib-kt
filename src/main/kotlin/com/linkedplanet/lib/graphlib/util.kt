@@ -24,3 +24,10 @@ fun <A> List<Edge<A>>.reduceEdgeList(nodes: List<A>): List<Edge<A>> =
         map { edge -> if (nodes.contains(edge.a) && nodes.contains(edge.b)) Option(edge) else None }
                 .filter { it is Some }
                 .mapNotNull { it.orNull() }
+
+
+fun <A> Option<List<A>>.orEmptyList() =
+        this.fold({ emptyList<A>() }, { it.id() })
+
+fun Option<Boolean>.orFalse() =
+        this.fold({ false }, { it.id() })

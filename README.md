@@ -13,7 +13,6 @@ A directed graph (or digraph) is a graph that is made up of a set of vertices co
 #### Construction
 A new instance can be constructed from a list of Edges
 
-#### Supported Methods
-
 ## Introduced Types 
   * Edge - data class to represent edges within a graph
+  * Tree - for tree representations of a graph
