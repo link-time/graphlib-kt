@@ -1,0 +1,9 @@
+0.0.2
+ADDED - Tree data class
+ADDED - asTree Method on DirectedGraph
+ADDED - pathExists and getPath Methods to DirectedGraph
+ADDED - getContainedTrees method on DirectedGraph
+ADDED - Tests for new functionality
+
+0.0.1
+Initial Version

@@ -19,8 +19,7 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
 
     fun getEdgeCount(): Int = getEdgeList().size
 
-    /***
-     * getAdjacencyMap
+    /**
      * Function constructs a forward directed Map, which maps all Vertices to their out-going Edges
      *
      * Example:
@@ -35,8 +34,7 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
     fun getAdjacencyMap(): Map<A, List<Edge<A>>> =
             buildAdjacencyMap(getVertexList(), getEdgeList()) { a -> { b -> b.a == a } }
 
-    /***
-     * getInverseAdjacencyMap
+    /**
      * Function constructs a backwards directed Map, which maps all Vertices to their in-going Edges
      *
      * Example:
@@ -67,18 +65,15 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
     Another Option:
     If The graph has a Topological Sort, there are no cycles
      */
+
     /**
-     * hasCycle
-     *
-     * returns true if the graph contains a cycle
+     * Function returns true if the graph contains a cycle
      */
     fun hasCycle(): Boolean {
         return this.isCycling().fold({ true }, { x -> x.id() })
     }
 
     /**
-     * getContainedTrees
-     *
      * Function returns a list of trees that are contained within the graph.
      * To achieve this, it uses the asTree function with all current starting nodes
      */
@@ -87,16 +82,12 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
                     .map { vertex -> asTree(vertex.key) }
 
     /**
-     * pathExists
-     *
      * Returns true if there is a path between the given Vertices in the graph
      */
     fun pathExists(fromVertex: A, toVertex: A): Boolean =
             getPath(fromVertex, toVertex) is Some
 
     /**
-     * getPath
-     *
      * Returns a path between the given Vertices on the graph or None, if there is no such path.
      */
     fun getPath(fromVertex: A, toVertex: A): Option<List<Edge<A>>> =
@@ -118,8 +109,6 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
             }
 
     /**
-     * asTree
-     *
      * Function generates a tree from the graph with the given startingNode as Tree-root
      */
     private fun asTree(startingVertex: A): Option<Tree<A>> =
@@ -143,8 +132,6 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
             }
 
     /**
-     * removeDisconnectedGraphs
-     *
      * Function returns a Directed Graph that is strongly connected with the given reference Vertex
      */
     private fun removeDisconnectedGraphs(referenceVertex: A): DirectedGraph<A> =
@@ -153,8 +140,6 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
             ))
 
     /**
-     * buildAdjacencyMap
-     *
      * Function takes a list of vertices and a list of edges as well as
      */
     private fun buildAdjacencyMap(
@@ -168,8 +153,6 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
             }.toMap()
 
     /**
-     * extractVertexList
-     *
      * Function takes a list of Edges and returns the list of Vertices connected by them.
      */
     private fun extractVertexList(): List<A> =
@@ -181,9 +164,7 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
                     .toList()
 
 
-    /***
-     * isCycling
-     *
+    /**
      * Function takes a graph and recursively reduces it by all Nodes that can't be part of a cycle.
      * If during reduction a graph is produced, which can't be reduced further and has more than one Element,
      * that graph is a cycle.
@@ -195,9 +176,7 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
         }
     }
 
-    /***
-     * reduceByStartingNodes
-     *
+    /**
      * Function reduces a directed graph by removing all Nodes, which don't have any inbound Edges
      * Before returning, it checks whether any Nodes have been removed.
      * If this is not the case it returns None, indicating the graph is irreducible.

@@ -6,15 +6,11 @@ import arrow.core.Some
 import arrow.core.extensions.list.traverse.map
 
 /**
- * id
- *
  * Universal Identity function
  */
 fun <A> A.id(): A = this
 
 /**
- * reduceEdgeList
- *
  * Reduces the list provided as receiver to a list of edges that connect the edges provided as parameter.
  *
  * Example:

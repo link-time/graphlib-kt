@@ -7,12 +7,13 @@ import arrow.core.Tuple2
 import arrow.core.extensions.list.traverse.map
 
 /**
- * Edge
- *
- * data class to represent an edge in a unweighted graph
+ * Data class to represent an edge in a unweighted graph
  */
 data class Edge<A>(val a: A, val b: A)
 
+/**
+ * Data class to represent a tree
+ */
 data class Tree<A>(val root: A, val subTrees: Option<List<Tree<A>>>)
 
 // ---------------------------------------------
