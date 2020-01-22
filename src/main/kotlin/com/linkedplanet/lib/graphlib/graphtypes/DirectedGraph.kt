@@ -55,8 +55,10 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
     operator fun minus(b: DirectedGraph<A>): DirectedGraph<A> =
             DirectedGraph((this.getEdgeList().toSet() - b.getEdgeList().toSet()).toList())
 
-    operator fun minus(b: List<Edge<A>>): DirectedGraph<A> =
-            DirectedGraph((this.getEdgeList().toSet() - b.toSet()).toList())
+    // Sadly JVM can't handle generics so the Option 2 has to go, as it's the
+    // only one not used
+    //operator fun minus(b: List<Edge<A>>): DirectedGraph<A> =
+    //        DirectedGraph((this.getEdgeList().toSet() - b.toSet()).toList())
 
     operator fun minus(b: List<A>): DirectedGraph<A> = 
             DirectedGraph(this.getEdgeList().filterNot { e -> 
@@ -185,7 +187,7 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
      */
     private fun removeDisconnectedGraphs(referenceVertex: A): DirectedGraph<A> =
             this - (this.getVertexList()
-                .filter { v -> 
+                .filterNot { v -> 
                     pathExists(referenceVertex, v) || pathExists(v, referenceVertex) 
                 })
 
@@ -233,7 +235,7 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
      */
     private fun reduceByStartingNodes(): Option<DirectedGraph<A>> {
         val reducedGraph = this - (this.getInverseAdjacencyMap()
-                        .filter { a -> a.value.isNotEmpty() }
+                        .filterNot { a -> a.value.isNotEmpty() }
                         .keys
                         .toList())
         return if (reducedGraph.getVerticesCount() == this.getVerticesCount()) {
