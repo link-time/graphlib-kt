@@ -27,6 +27,10 @@ import com.linkedplanet.lib.graphlib.*
 
 
 class DirectedGraph<A>(links: List<Edge<A>>) {
+    // --------------------
+    // Functions that don't require explanation
+    // --------------------
+
     val getEdgeList: () -> List<Edge<A>> = { links.toSet().toList() }
 
     fun getVertexList(): List<A> = extractVertexList()
@@ -34,6 +38,35 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
     fun getVerticesCount(): Int = getVertexList().size
 
     fun getEdgeCount(): Int = getEdgeList().size
+
+    // --------------------
+    // Basic Operators
+    // --------------------
+    operator fun plus(b: DirectedGraph<A>): DirectedGraph<A> =
+            DirectedGraph(this.getEdgeList() + b.getEdgeList()) 
+
+    /* Three Kinds of minus can be defined on a digraph:
+     * 1. Subtract a graph from a graph: G1 - G2 
+     * 2. Subtract a list of Edges from a graph: G1 - [E]
+     * 3. Subtract a list of Vertices from a graph: G1 - [V]
+     * 
+     * Since this is not a multigraph, we can get away with converting to set
+     */
+    operator fun minus(b: DirectedGraph<A>): DirectedGraph<A> =
+            DirectedGraph((this.getEdgeList().toSet() - b.getEdgeList().toSet()).toList())
+
+    operator fun minus(b: List<Edge<A>>): DirectedGraph<A> =
+            DirectedGraph((this.getEdgeList().toSet() - b.toSet()).toList())
+
+    operator fun minus(b: List<A>): DirectedGraph<A> = 
+            DirectedGraph(this.getEdgeList().filterNot { e -> 
+                b.contains(e.a)|| b.contains(e.b) }
+            )
+
+
+    // --------------------
+    // Functions that may require explanation
+    // --------------------
 
     /**
      * Function constructs a forward directed Map, which maps all Vertices to their out-going Edges
@@ -137,7 +170,7 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
 
                 Some(Tree(startingVertex,
                         ( if (startingVertices.isNotEmpty()) {
-                            startingVertices.map { a -> DirectedGraph(reducedGraph.getEdgeList().filter { a -> a.a != startingVertex }).asTree(a) }
+                            startingVertices.map { a -> DirectedGraph(reducedGraph.getEdgeList().filter { b -> b.a != startingVertex }).asTree(a) }
                                     .sequence(Option.applicative())
                                     .map { it.fix() }
                         } else {
@@ -151,9 +184,10 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
      * Function returns a Directed Graph that is strongly connected with the given reference Vertex
      */
     private fun removeDisconnectedGraphs(referenceVertex: A): DirectedGraph<A> =
-            DirectedGraph(this.getEdgeList().reduceEdgeList(
-                    this.getVertexList().filter { v -> pathExists(referenceVertex, v) || pathExists(v, referenceVertex) }
-            ))
+            this - (this.getVertexList()
+                .filter { v -> 
+                    pathExists(referenceVertex, v) || pathExists(v, referenceVertex) 
+                })
 
     /**
      * Function takes a list of vertices and a list of edges as well as
@@ -198,11 +232,10 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
      * If this is not the case it returns None, indicating the graph is irreducible.
      */
     private fun reduceByStartingNodes(): Option<DirectedGraph<A>> {
-        val reducedGraph = DirectedGraph(this.getEdgeList()
-                .reduceEdgeList(this.getInverseAdjacencyMap()
+        val reducedGraph = this - (this.getInverseAdjacencyMap()
                         .filter { a -> a.value.isNotEmpty() }
                         .keys
-                        .toList()))
+                        .toList())
         return if (reducedGraph.getVerticesCount() == this.getVerticesCount()) {
             None
         } else {

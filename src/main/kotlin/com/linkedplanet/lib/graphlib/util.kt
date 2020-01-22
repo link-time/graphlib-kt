@@ -26,18 +26,6 @@ import arrow.core.extensions.list.traverse.map
  */
 fun <A> A.id(): A = this
 
-/**
- * Reduces the list provided as receiver to a list of edges that connect the edges provided as parameter.
- *
- * Example:
- * [(a,b),(b,c),(c,d)].reduceEdgeList([b,c,d]) => [(b,c),(c,d)]
- */
-fun <A> List<Edge<A>>.reduceEdgeList(nodes: List<A>): List<Edge<A>> =
-        map { edge -> if (nodes.contains(edge.a) && nodes.contains(edge.b)) Option(edge) else None }
-                .filter { it is Some }
-                .mapNotNull { it.orNull() }
-
-
 fun <A> Option<List<A>>.orEmptyList() =
         this.fold({ emptyList<A>() }, { it.id() })
 
