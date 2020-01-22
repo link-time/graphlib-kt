@@ -1,4 +1,5 @@
 # graphlib-kt
+[![Actions Status](https://github.com/link-time/graphlib-kt/workflows/Kotlin%20CI/badge.svg)](https://github.com/link-time/graphlib-kt/actions)
 [![GitHub License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Kotlin library for immutable graphs
