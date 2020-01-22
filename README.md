@@ -1,4 +1,6 @@
 # graphlib-kt
+[![GitHub License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 Kotlin library for immutable graphs
 
 # Building 
