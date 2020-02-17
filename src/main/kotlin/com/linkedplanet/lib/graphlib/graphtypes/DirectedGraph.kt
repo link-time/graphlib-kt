@@ -43,7 +43,7 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
     // Basic Operators
     // --------------------
     operator fun plus(b: DirectedGraph<A>): DirectedGraph<A> =
-            DirectedGraph(this.getEdgeList() + b.getEdgeList()) 
+            DirectedGraph(this.getEdgeList() + b.getEdgeList())
 
     /* Three Kinds of minus can be defined on a digraph:
      * 1. Subtract a graph from a graph: G1 - G2 
@@ -55,13 +55,14 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
     operator fun minus(b: DirectedGraph<A>): DirectedGraph<A> =
             DirectedGraph((this.getEdgeList().toSet() - b.getEdgeList().toSet()).toList())
 
-    // Sadly JVM can't handle generics so the Option 2 has to go, as it's the
-    // only one not used
-    //operator fun minus(b: List<Edge<A>>): DirectedGraph<A> =
-    //        DirectedGraph((this.getEdgeList().toSet() - b.toSet()).toList())
+    // Sadly JVM can't handle true generics so we have to cheat a little
+    // by requiring the edges to be given as a set instead of a list.
+    // This Way JVM can differentiate between Option 2 and 3.
+    operator fun minus(b: Set<Edge<A>>): DirectedGraph<A> =
+            DirectedGraph((this.getEdgeList().toSet() - b).toList())
 
-    operator fun minus(b: List<A>): DirectedGraph<A> = 
-            DirectedGraph(this.getEdgeList().filterNot { e -> 
+    operator fun minus(b: List<A>): DirectedGraph<A> =
+            DirectedGraph(this.getEdgeList().filterNot { e ->
                 b.contains(e.a)|| b.contains(e.b) }
             )
 
@@ -187,8 +188,8 @@ class DirectedGraph<A>(links: List<Edge<A>>) {
      */
     private fun removeDisconnectedGraphs(referenceVertex: A): DirectedGraph<A> =
             this - (this.getVertexList()
-                .filterNot { v -> 
-                    pathExists(referenceVertex, v) || pathExists(v, referenceVertex) 
+                .filterNot { v ->
+                    pathExists(referenceVertex, v) || pathExists(v, referenceVertex)
                 })
 
     /**
