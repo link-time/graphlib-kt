@@ -132,17 +132,17 @@ class TestDirectedGraph : FunSpec({
         }
 
         test("Tree size") {
-            testSubject.getContainedTrees().first().map{ it.size } shouldBe Some(3)
+            testSubject.getContainedTrees().first()?.size shouldBe Some(3)
         }
 
         test("Subtree top nodes") {
-            testSubject.getContainedTrees().first().orNull()?.root shouldBe "A"
-            testSubject.getContainedTrees()[1].orNull()?.root shouldBe "D"
+            testSubject.getContainedTrees().first()?.root shouldBe "A"
+            testSubject.getContainedTrees()[1]?.root shouldBe "D"
         }
 
         test("Tree termination") {
-            testSubject.getContainedTrees()[0].orNull()?.subTrees?.orNull()?.first()?.subTrees shouldNotBe None
-            testSubject.getContainedTrees()[1].orNull()?.subTrees?.orNull()?.first()?.subTrees shouldBe None
+            testSubject.getContainedTrees()[0]?.subTrees?.first()?.subTrees shouldNotBe None
+            testSubject.getContainedTrees()[1]?.subTrees?.first()?.subTrees shouldBe None
         }
 
     }

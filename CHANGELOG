@@ -1,3 +1,8 @@
+0.1.0
+REMOVED - Arrow dependency
+ADDED - Predicate type-alias
+CHANGED - Edge to type-alias for Pair
+
 0.0.2
 ADDED - Tree data class
 ADDED - asTree Method on DirectedGraph
