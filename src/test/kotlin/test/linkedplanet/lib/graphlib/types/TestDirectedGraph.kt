@@ -16,14 +16,9 @@
 
 package test.linkedplanet.lib.graphlib.types
 
-import arrow.core.None
-import arrow.core.Some
-import arrow.core.extensions.option.foldable.size
+import com.linkedplanet.lib.graphlib.*
 import com.linkedplanet.lib.graphlib.graphtypes.DirectedGraph
-import com.linkedplanet.lib.graphlib.Edge
-import com.linkedplanet.lib.graphlib.size
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotBe
+import io.kotlintest.*
 import io.kotlintest.specs.FunSpec
 
 
@@ -114,7 +109,7 @@ class TestDirectedGraph : FunSpec({
             testSubject.pathExists("A","F") shouldBe false
         }
         test("Long Path") {
-            testSubject.getPath("A","J") shouldNotBe None
+            testSubject.getPath("A","J") shouldNotBe null
             testSubject.pathExists("A","J") shouldBe true
         }
     }
@@ -132,17 +127,17 @@ class TestDirectedGraph : FunSpec({
         }
 
         test("Tree size") {
-            testSubject.getContainedTrees().first().map{ it.size } shouldBe Some(3)
+            testSubject.getContainedTrees().first()?.size shouldBe 3
         }
 
         test("Subtree top nodes") {
-            testSubject.getContainedTrees().first().orNull()?.root shouldBe "A"
-            testSubject.getContainedTrees()[1].orNull()?.root shouldBe "D"
+            testSubject.getContainedTrees().first()?.root shouldBe "A"
+            testSubject.getContainedTrees()[1]?.root shouldBe "D"
         }
 
         test("Tree termination") {
-            testSubject.getContainedTrees()[0].orNull()?.subTrees?.orNull()?.first()?.subTrees shouldNotBe None
-            testSubject.getContainedTrees()[1].orNull()?.subTrees?.orNull()?.first()?.subTrees shouldBe None
+            testSubject.getContainedTrees()[0]?.subTrees?.first()?.subTrees shouldNotBe null
+            testSubject.getContainedTrees()[1]?.subTrees?.first()?.subTrees shouldBe null
         }
 
     }

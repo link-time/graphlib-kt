@@ -16,18 +16,19 @@
 
 package com.linkedplanet.lib.graphlib
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.extensions.list.traverse.map
-
 /**
  * Universal Identity function
  */
 fun <A> A.id(): A = this
 
-fun <A> Option<List<A>>.orEmptyList() =
-        this.fold({ emptyList<A>() }, { it.id() })
+fun <A> List<A>.orEmptyList() =
+        when(this) {
+            null -> emptyList()
+            else -> this
+        }
 
-fun Option<Boolean>.orFalse() =
-        this.fold({ false }, { it.id() })
+fun Boolean?.orFalse() =
+        when(this) {
+            null -> false
+            else -> this
+        }
