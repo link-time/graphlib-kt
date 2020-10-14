@@ -1,5 +1,5 @@
 group = "com.linked-planet.lib"
-version = "0.0.1"
+version = "0.1.0"
 
 ext.set("kotlinVersion", "1.3.50-eap-54")
 ext.set("jvmTarget", "1.8")
